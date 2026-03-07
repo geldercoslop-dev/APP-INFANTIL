@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerador de Ícones</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Criar gradiente
+        const gradient = ctx.createLinearGradient(0, 0, 512, 512);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        
+        // Desenhar fundo
+        ctx.fillStyle = gradient;
+        ctx.roundRect(0, 0, 512, 512, 120);
+        ctx.fill();
+        
+        // Desenhar emoji
+        ctx.font = 'bold 180px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('🚀', 256, 280);
+        
+        // Gerar download
+        function downloadIcon(size, suffix = '') {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = size;
+            tempCanvas.height = size;
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Redesenhar no tamanho correto
+            const tempGradient = tempCtx.createLinearGradient(0, 0, size, size);
+            tempGradient.addColorStop(0, '#667eea');
+            tempGradient.addColorStop(1, '#764ba2');
+            
+            tempCtx.fillStyle = tempGradient;
+            tempCtx.roundRect(0, 0, size, size, size * 0.234);
+            tempCtx.fill();
+            
+            tempCtx.font = `bold ${size * 0.35}px Arial`;
+            tempCtx.textAlign = 'center';
+            tempCtx.textBaseline = 'middle';
+            tempCtx.fillText('🚀', size/2, size * 0.55);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `icon-${size}${suffix}.png`;
+            link.href = tempCanvas.toDataURL();
+            link.click();
+        }
+        
+        // Gerar todos os ícones
+        setTimeout(() => {
+            downloadIcon(192);
+            setTimeout(() => downloadIcon(512), 500);
+            setTimeout(() => downloadIcon(192, '-maskable'), 1000);
+            setTimeout(() => downloadIcon(512, '-maskable'), 1500);
+        }, 100);
+    </script>
+</body>
+</html>

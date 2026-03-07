@@ -1,0 +1,17 @@
+.coin-display {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.coin-icon {
+  font-size: 1em;
+}
+
+.coin-value {
+  font-size: 1em;
+  color: inherit;
+}
+
+/* Animation styles are imported from microInteractions.css */

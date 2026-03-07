@@ -1,0 +1,78 @@
+.gender-setup {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  padding: 1rem;
+}
+
+.gender-setup__container {
+  text-align: center;
+  max-width: 600px;
+  width: 100%;
+}
+
+.gender-setup__header {
+  margin-bottom: 3rem;
+}
+
+.gender-setup__header h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+  font-weight: bold;
+}
+
+.gender-setup__header p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.gender-setup__options {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.gender-option {
+  background: #ffffff;
+  border: 3px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  min-width: 150px;
+}
+
+.gender-option:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.gender-option--boy {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.gender-option--girl {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+.gender-option__icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  line-height: 1;
+}
+
+.gender-option__label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,126 @@
+.level-progress {
+  background: #ffffff;
+  border: 2px solid #e5e7eb;
+  border-radius: 15px;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.level-progress:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.level-progress--compact {
+  padding: 0.75rem;
+}
+
+.level-progress__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  gap: 1rem;
+}
+
+.level-progress__level,
+.level-progress__coins,
+.level-progress__streak {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+}
+
+.level-progress__label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.level-progress__value {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.level-progress__icon {
+  font-size: 1rem;
+}
+
+.level-progress__xp {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.level-progress__xp-text {
+  font-size: 0.9rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.level-progress__bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.level-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  border-radius: 4px;
+  transition: width 0.5s ease-out;
+  position: relative;
+}
+
+.level-progress__fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .level-progress {
+    padding: 0.75rem;
+  }
+  
+  .level-progress__header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .level-progress__level,
+  .level-progress__coins,
+  .level-progress__streak {
+    flex: 1;
+    min-width: 80px;
+    justify-content: center;
+  }
+  
+  .level-progress__value {
+    font-size: 1rem;
+  }
+  
+  .level-progress__bar {
+    height: 6px;
+  }
+}

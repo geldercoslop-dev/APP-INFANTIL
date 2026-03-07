@@ -1,0 +1,267 @@
+/* Micro-interactions para botões, cards e elementos interativos */
+
+/* Animações de botão */
+.btn-bounce {
+  transition: transform 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.btn-bounce:active {
+  transform: scale(0.95);
+}
+
+.btn-bounce:hover {
+  transform: translateY(-2px);
+}
+
+/* Animações de hover para cards */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+/* Animações de pulse para elementos importantes */
+.pulse-animation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+/* Animações de moedas */
+.coin-increase {
+  animation: coinIncrease 0.6s ease-out;
+}
+
+@keyframes coinIncrease {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.3) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+/* Animações de shake para erro */
+.shake-animation {
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-2px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(2px);
+  }
+}
+
+/* Animações de glow para elementos especiais */
+.glow-animation {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+  }
+  to {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 30px rgba(255, 255, 255, 0.6);
+  }
+}
+
+/* Animações de slide-in para novos elementos */
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animações de bounce-in para notificações */
+.bounce-in {
+  animation: bounceIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Micro-interactions específicas para diferentes elementos */
+.mission-item-complete {
+  animation: missionComplete 0.8s ease-out;
+}
+
+@keyframes missionComplete {
+  0% {
+    transform: scale(1);
+    background-color: rgba(52, 211, 153, 0.1);
+  }
+  50% {
+    transform: scale(1.1);
+    background-color: rgba(52, 211, 153, 0.3);
+  }
+  100% {
+    transform: scale(1);
+    background-color: rgba(52, 211, 153, 0.2);
+  }
+}
+
+.level-up-celebration {
+  animation: levelUpCelebration 1s ease-out;
+}
+
+@keyframes levelUpCelebration {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  75% {
+    transform: scale(1.15) rotate(3deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.achievement-unlock {
+  animation: achievementUnlock 1.2s ease-out;
+}
+
+@keyframes achievementUnlock {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) rotate(-180deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) rotate(90deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Animações suaves para mascote */
+.mascot-happy {
+  animation: mascotHappy 1s ease-in-out;
+}
+
+@keyframes mascotHappy {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-10px) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+.mascot-dance {
+  animation: mascotDance 1.5s ease-in-out;
+}
+
+@keyframes mascotDance {
+  0%, 100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-5px) rotate(-10deg);
+  }
+  50% {
+    transform: translateX(5px) rotate(10deg);
+  }
+  75% {
+    transform: translateX(-3px) rotate(-5deg);
+  }
+}
+
+/* Performance optimizations */
+@media (prefers-reduced-motion: reduce) {
+  .btn-bounce,
+  .card-hover,
+  .pulse-animation,
+  .coin-increase,
+  .shake-animation,
+  .glow-animation,
+  .slide-in,
+  .bounce-in,
+  .mission-item-complete,
+  .level-up-celebration,
+  .achievement-unlock,
+  .mascot-happy,
+  .mascot-dance {
+    animation: none;
+    transition: none;
+  }
+  
+  .card-hover:hover {
+    transform: none;
+  }
+  
+  .btn-bounce:active {
+    transform: none;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+  .btn-bounce:hover {
+    transform: none;
+  }
+  
+  .card-hover:hover {
+    transform: none;
+    box-shadow: inherit;
+  }
+}

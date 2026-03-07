@@ -1,0 +1,86 @@
+.mascot-setup {
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background: transparent;
+}
+
+.mascot-setup--boy {
+  background: transparent;
+}
+
+.mascot-setup--girl {
+  background: transparent;
+}
+
+.mascot-setup__container {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.mascot-setup__header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.mascot-setup__header h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem 0;
+  color: #1f2937;
+  font-weight: bold;
+}
+
+.mascot-setup__header p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+.mascot-setup__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.mascot-card {
+  background: #ffffff;
+  border: 3px solid #e5e7eb;
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.mascot-card:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  border-color: #e5e7eb;
+}
+
+.mascot-card__image {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+  border-radius: 15px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.mascot-card__name {
+  font-weight: 600;
+  color: #374151;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}

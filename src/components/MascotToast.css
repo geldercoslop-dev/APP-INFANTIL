@@ -1,0 +1,66 @@
+.mascot-toast {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: 10000;
+  min-width: 300px;
+  max-width: 400px;
+  animation: bounceIn 0.6s ease-out;
+}
+
+.mascot-toast__content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mascot-toast__icon {
+  font-size: 24px;
+  animation: pulse 1s infinite;
+}
+
+.mascot-toast__message {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+@keyframes bounceIn {
+  0% {
+    transform: scale(0.3) translateX(100%);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05) translateX(0);
+  }
+  70% {
+    transform: scale(0.9) translateX(0);
+  }
+  100% {
+    transform: scale(1) translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+@media (max-width: 768px) {
+  .mascot-toast {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
+  }
+}

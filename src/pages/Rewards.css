@@ -1,0 +1,236 @@
+/* Rewards Page Styles */
+.rewards__coins {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: var(--primary);
+  color: white;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-bold);
+}
+
+.coins-icon {
+  font-size: var(--font-size-lg);
+}
+
+.coins-amount {
+  font-size: var(--font-size-lg);
+}
+
+/* Tabs */
+.rewards__tabs {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.tab-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-medium);
+}
+
+.tab-chip:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.tab-chip.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.tab-emoji {
+  font-size: var(--font-size-lg);
+}
+
+.tab-name {
+  font-size: var(--font-size-sm);
+}
+
+/* Message Toast */
+.rewards__message {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-medium);
+  z-index: 100;
+  animation: slideIn 0.3s ease-out;
+  max-width: 300px;
+}
+
+.rewards__message--success {
+  background: var(--success);
+  color: white;
+  border: 2px solid var(--success);
+}
+
+.rewards__message--error {
+  background: var(--error);
+  color: white;
+  border: 2px solid var(--error);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Rewards Grid */
+.rewards__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.reward-card {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-lg);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.reward-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+  border-color: var(--primary);
+}
+
+.reward-card__emoji {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+  line-height: 1;
+}
+
+.reward-card__info {
+  margin-bottom: var(--spacing-lg);
+}
+
+.reward-card__title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-bold);
+  color: var(--text);
+  margin: 0 0 var(--spacing-sm) 0;
+}
+
+.reward-card__description {
+  font-size: var(--font-size-sm);
+  color: var(--text-light);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.4;
+}
+
+.reward-card__cost {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-bold);
+  color: var(--primary);
+}
+
+.cost-icon {
+  font-size: var(--font-size-lg);
+}
+
+.cost-amount {
+  font-size: var(--font-size-lg);
+}
+
+.reward-card__actions {
+  margin-top: var(--spacing-lg);
+}
+
+.redeemed-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.redeemed-date {
+  font-size: var(--font-size-sm);
+  color: var(--success);
+  font-weight: var(--font-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Empty State */
+.rewards__empty {
+  text-align: center;
+  padding: var(--spacing-xl);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.empty-text {
+  font-size: var(--font-size-lg);
+  color: var(--text-light);
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .rewards__tabs {
+    justify-content: center;
+  }
+  
+  .rewards__grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-md);
+  }
+  
+  .reward-card__emoji {
+    font-size: 3rem;
+  }
+  
+  .rewards__message {
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .rewards__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tab-chip {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+  }
+  
+  .tab-emoji {
+    font-size: var(--font-size-md);
+  }
+}

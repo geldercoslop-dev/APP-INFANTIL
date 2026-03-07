@@ -1,0 +1,61 @@
+.desktop-layout {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.desktop-layout__wrapper {
+  width: 100%;
+  max-width: none;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
+  border-radius: 0;
+  box-shadow: none;
+  background: white;
+  position: relative;
+}
+
+.desktop-layout__container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Boy theme */
+.desktop-layout--boy {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+/* Girl theme */
+.desktop-layout--girl {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+}
+
+/* Desktop layouts for larger screens */
+@media (min-width: 1200px) {
+  .desktop-layout {
+    padding: 2rem;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .desktop-layout__wrapper {
+    max-width: 800px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@media (min-width: 1600px) {
+  .desktop-layout__wrapper {
+    max-width: 1000px;
+  }
+}

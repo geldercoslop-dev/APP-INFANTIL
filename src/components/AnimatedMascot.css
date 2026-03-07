@@ -1,0 +1,297 @@
+.animated-mascot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mascot-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mascot-image {
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  transition: transform 0.3s ease;
+}
+
+/* Size variants */
+.mascot--small .mascot-image {
+  width: 40px;
+  height: 40px;
+}
+
+.mascot--medium .mascot-image {
+  width: 200px;
+  height: 200px;
+}
+
+.mascot--large .mascot-image {
+  width: 300px;
+  height: 300px;
+}
+
+/* Idle animation */
+.mascot--medium .mascot-image {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+/* Happy animation */
+.mascot--happy .mascot-image {
+  animation: happyBounce 1s ease-out;
+}
+
+/* Mission complete animation */
+.mascot--mission-complete .mascot-image {
+  animation: missionCompleteMascot 1.2s ease-out;
+}
+
+@keyframes missionCompleteMascot {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  25% {
+    transform: scale(1.1) rotate(-5deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(5deg);
+  }
+  75% {
+    transform: scale(1.1) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* Level up animation */
+.mascot--level-up .mascot-image {
+  animation: levelUpMascot 1.5s ease-out;
+}
+
+@keyframes levelUpMascot {
+  0% {
+    transform: scale(1) rotate(0deg) translateY(0px);
+  }
+  20% {
+    transform: scale(1.3) rotate(10deg) translateY(-20px);
+  }
+  40% {
+    transform: scale(1.1) rotate(-8deg) translateY(-30px);
+  }
+  60% {
+    transform: scale(1.2) rotate(6deg) translateY(-25px);
+  }
+  80% {
+    transform: scale(1.05) rotate(-3deg) translateY(-10px);
+  }
+  100% {
+    transform: scale(1) rotate(0deg) translateY(0px);
+  }
+}
+
+/* Celebrating animation */
+.mascot--celebrating .mascot-image {
+  animation: celebratingMascot 2s ease-in-out infinite;
+}
+
+@keyframes celebratingMascot {
+  0%, 100% {
+    transform: scale(1) rotate(0deg) translateY(0px);
+  }
+  25% {
+    transform: scale(1.05) rotate(-5deg) translateY(-8px);
+  }
+  50% {
+    transform: scale(1.1) rotate(5deg) translateY(-12px);
+  }
+  75% {
+    transform: scale(1.05) rotate(-3deg) translateY(-6px);
+  }
+}
+
+@keyframes happyBounce {
+  0% { transform: scale(1) translateY(0px); }
+  25% { transform: scale(1.1) translateY(-20px) rotate(-5deg); }
+  50% { transform: scale(1.2) translateY(-30px) rotate(5deg); }
+  75% { transform: scale(1.1) translateY(-15px) rotate(-2deg); }
+  100% { transform: scale(1) translateY(0px) rotate(0deg); }
+}
+
+/* Reaction emoji */
+.mascot-reaction {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  animation: popIn 0.5s ease-out;
+}
+
+.reaction-emoji {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+@keyframes popIn {
+  0% { 
+    transform: scale(0) rotate(-180deg); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.2) rotate(10deg); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: scale(1) rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+/* Small mascot adjustments */
+.mascot--small.mascot--happy .mascot-image {
+  animation: happyBounceSmall 0.8s ease-out;
+}
+
+@keyframes happyBounceSmall {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3) translateY(-5px); }
+  100% { transform: scale(1) translateY(0px); }
+}
+
+.mascot--small .mascot-reaction {
+  top: -15px;
+  right: -15px;
+}
+
+.mascot--small .reaction-emoji {
+  font-size: 1.5rem;
+}
+
+/* Large mascot adjustments */
+.mascot--large.mascot--happy .mascot-image {
+  animation: happyBounceLarge 1.2s ease-out;
+}
+
+@keyframes happyBounceLarge {
+  0% { transform: scale(1) translateY(0px); }
+  25% { transform: scale(1.05) translateY(-25px) rotate(-3deg); }
+  50% { transform: scale(1.1) translateY(-40px) rotate(3deg); }
+  75% { transform: scale(1.05) translateY(-20px) rotate(-1deg); }
+  100% { transform: scale(1) translateY(0px) rotate(0deg); }
+}
+
+.mascot--large .mascot-reaction {
+  top: -25px;
+  right: -25px;
+}
+
+.mascot--large .reaction-emoji {
+  font-size: 2.5rem;
+}
+
+/* Equipment Overlays */
+.mascot-overlay {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: equipPop 0.5s ease-out;
+  z-index: 2;
+}
+
+.mascot-hat {
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.mascot-outfit {
+  bottom: -10px;
+  right: -10px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #fbbf24;
+  box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+}
+
+.overlay-emoji {
+  font-size: 1.5rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Size adjustments for overlays */
+.mascot--small .mascot-hat {
+  top: -8px;
+}
+
+.mascot--small .mascot-outfit {
+  width: 20px;
+  height: 20px;
+  bottom: -5px;
+  right: -5px;
+}
+
+.mascot--small .overlay-emoji {
+  font-size: 1rem;
+}
+
+.mascot--large .mascot-hat {
+  top: -20px;
+}
+
+.mascot--large .mascot-outfit {
+  width: 50px;
+  height: 50px;
+  bottom: -15px;
+  right: -15px;
+}
+
+.mascot--large .overlay-emoji {
+  font-size: 2rem;
+}
+
+@keyframes equipPop {
+  0% { 
+    transform: scale(0) rotate(-180deg); 
+    opacity: 0; 
+  }
+  50% { 
+    transform: scale(1.2) rotate(10deg); 
+    opacity: 1; 
+  }
+  100% { 
+    transform: scale(1) rotate(0deg); 
+    opacity: 1; 
+  }
+}
+
+/* Celebration animation */
+.mascot--celebrating .mascot-image {
+  animation: celebrate 1s ease-out;
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.2) rotate(-10deg); }
+  40% { transform: scale(1.3) rotate(10deg); }
+  60% { transform: scale(1.2) translateY(-20px) rotate(-5deg); }
+  80% { transform: scale(1.1) translateY(-10px) rotate(2deg); }
+  100% { transform: scale(1) translateY(0px) rotate(0deg); }
+}
+
+.mascot--celebrating .mascot-container {
+  animation: celebrateGlow 1s ease-out;
+}
+
+@keyframes celebrateGlow {
+  0%, 100% { filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2)); }
+  50% { filter: drop-shadow(0 8px 20px rgba(251, 191, 36, 0.6)); }
+}
