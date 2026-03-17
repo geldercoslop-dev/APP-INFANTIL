@@ -58,6 +58,13 @@ type LegacyWeeklyChallenge = {
   [key: string]: unknown;
 };
 
+type ParentSecurity = {
+  pin: string;
+  unlockedUntil: number | null;
+  failedAttempts: number;
+  lockedUntil: number | null;
+};
+
 type BackupImportData = {
   user?: User;
   profile?: UserProfile;
@@ -77,6 +84,7 @@ type BackupImportData = {
   weeklyChallenges?: WeeklyChallengesState;
   lastDailyBonusDate?: string | null;
   parentSettings?: Partial<GameState['parentSettings']>;
+  parentSecurity?: Partial<ParentSecurity>;
   schoolSchedule?: SchoolScheduleState;
 };
 
@@ -157,6 +165,9 @@ interface GameState {
     weeklyGoal: string;
     soundEnabled: boolean;
   };
+
+  // Parent access control
+  parentSecurity: ParentSecurity;
   
   // School schedule
   schoolSchedule: SchoolScheduleState;
@@ -261,6 +272,10 @@ interface GameState {
   
   // Parent settings actions
   updateParentSettings: (settings: Partial<GameState['parentSettings']>) => void;
+  isParentAccessUnlocked: () => boolean;
+  unlockParentAccess: (pin: string) => { success: boolean; message: string };
+  lockParentAccess: () => void;
+  changeParentPin: (currentPin: string, newPin: string) => { success: boolean; message: string };
   
   // Shop actions
   buyItem: (itemId: string) => Promise<{ success: boolean; message: string }>;
@@ -366,6 +381,13 @@ const defaultParentSettings: GameState['parentSettings'] = {
   soundEnabled: true
 };
 
+const defaultParentSecurity: ParentSecurity = {
+  pin: '1234',
+  unlockedUntil: null,
+  failedAttempts: 0,
+  lockedUntil: null
+};
+
 const defaultAchievements: Record<AchievementKey, Achievement | null> = {
   first_mission: null,
   streak_3: null,
@@ -430,6 +452,7 @@ export const useGameStore = create<GameState>()(
       lastDailyBonusDate: null,
       dailyBonusMission: null,
       parentSettings: defaultParentSettings,
+      parentSecurity: defaultParentSecurity,
       schoolSchedule: { schedules: [] },
       weeklyResetDate: null,
       pendingPurchases: {},
@@ -1729,6 +1752,7 @@ export const useGameStore = create<GameState>()(
           weeklyChallenges: state.weeklyChallenges,
           lastDailyBonusDate: state.lastDailyBonusDate,
           parentSettings: state.parentSettings,
+          parentSecurity: state.parentSecurity,
           schoolSchedule: state.schoolSchedule
         }, null, 2);
       },
@@ -1744,6 +1768,21 @@ export const useGameStore = create<GameState>()(
           if (!importedData.user || !importedData.profile || !importedData.moods) {
             throw new Error('Estrutura de dados incompleta');
           }
+          const importedParentSecurity = importedData.parentSecurity || {};
+          const mergedParentSecurity: ParentSecurity = {
+            ...defaultParentSecurity,
+            ...importedParentSecurity,
+            pin: typeof importedParentSecurity.pin === 'string' && /^\d{4,8}$/.test(importedParentSecurity.pin)
+              ? importedParentSecurity.pin
+              : defaultParentSecurity.pin,
+            unlockedUntil: null,
+            lockedUntil:
+              typeof importedParentSecurity.lockedUntil === 'number' ? importedParentSecurity.lockedUntil : null,
+            failedAttempts:
+              typeof importedParentSecurity.failedAttempts === 'number'
+                ? Math.max(0, Math.floor(importedParentSecurity.failedAttempts))
+                : 0
+          };
 
           // Import all data
           set(() => ({
@@ -1767,6 +1806,7 @@ export const useGameStore = create<GameState>()(
             weeklyChallenges: importedData.weeklyChallenges || {},
             lastDailyBonusDate: importedData.lastDailyBonusDate || null,
             parentSettings: { ...defaultParentSettings, ...importedData.parentSettings },
+            parentSecurity: mergedParentSecurity,
             schoolSchedule: importedData.schoolSchedule || { schedules: [] }
           }));
           
@@ -2218,6 +2258,91 @@ export const useGameStore = create<GameState>()(
         set((state) => ({
           parentSettings: { ...state.parentSettings, ...settings }
         }));
+      },
+
+      isParentAccessUnlocked: () => {
+        const { parentSecurity } = get();
+        if (!parentSecurity.unlockedUntil) {
+          return false;
+        }
+
+        return Date.now() < parentSecurity.unlockedUntil;
+      },
+
+      unlockParentAccess: (pin) => {
+        const state = get();
+        const now = Date.now();
+        const normalizedPin = pin.trim();
+
+        if (state.parentSecurity.lockedUntil && now < state.parentSecurity.lockedUntil) {
+          const remainingSeconds = Math.ceil((state.parentSecurity.lockedUntil - now) / 1000);
+          return {
+            success: false,
+            message: `Painel bloqueado temporariamente. Tente em ${remainingSeconds}s.`
+          };
+        }
+
+        if (normalizedPin === state.parentSecurity.pin) {
+          set((prevState) => ({
+            parentSecurity: {
+              ...prevState.parentSecurity,
+              failedAttempts: 0,
+              lockedUntil: null,
+              unlockedUntil: now + 10 * 60 * 1000
+            }
+          }));
+          return { success: true, message: 'Acesso autorizado.' };
+        }
+
+        const nextFailedAttempts = state.parentSecurity.failedAttempts + 1;
+        const shouldLock = nextFailedAttempts >= 5;
+        set((prevState) => ({
+          parentSecurity: {
+            ...prevState.parentSecurity,
+            failedAttempts: shouldLock ? 0 : nextFailedAttempts,
+            lockedUntil: shouldLock ? now + 5 * 60 * 1000 : null,
+            unlockedUntil: null
+          }
+        }));
+
+        return {
+          success: false,
+          message: shouldLock
+            ? 'Muitas tentativas inválidas. Painel bloqueado por 5 minutos.'
+            : 'PIN incorreto.'
+        };
+      },
+
+      lockParentAccess: () => {
+        set((state) => ({
+          parentSecurity: {
+            ...state.parentSecurity,
+            unlockedUntil: null
+          }
+        }));
+      },
+
+      changeParentPin: (currentPin, newPin) => {
+        const state = get();
+        const normalizedCurrentPin = currentPin.trim();
+        const normalizedNewPin = newPin.trim();
+
+        if (normalizedCurrentPin !== state.parentSecurity.pin) {
+          return { success: false, message: 'PIN atual incorreto.' };
+        }
+
+        if (!/^\d{4,8}$/.test(normalizedNewPin)) {
+          return { success: false, message: 'Novo PIN deve ter entre 4 e 8 dígitos numéricos.' };
+        }
+
+        set((prevState) => ({
+          parentSecurity: {
+            ...prevState.parentSecurity,
+            pin: normalizedNewPin
+          }
+        }));
+
+        return { success: true, message: 'PIN atualizado com sucesso.' };
       },
       
       // School schedule actions

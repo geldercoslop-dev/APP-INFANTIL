@@ -34,7 +34,9 @@ const Parent = () => {
     rejectPurchase,
     pendingPurchases,
     activityHistory,
-    getUserStats
+    getUserStats,
+    lockParentAccess,
+    changeParentPin
   } = useGameStore();
   const [activeSection, setActiveSection] = useState<'dashboard' | 'goals' | 'approvals' | 'missions' | 'rewards' | 'profile' | 'settings' | 'school'>('dashboard');
   const [editingMission, setEditingMission] = useState<string | null>(null);
@@ -49,6 +51,8 @@ const Parent = () => {
   const [showMissionForm, setShowMissionForm] = useState(false);
   const [showRewardForm, setShowRewardForm] = useState(false);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
+  const [pinForm, setPinForm] = useState({ currentPin: '', newPin: '', confirmPin: '' });
+  const [pinFeedback, setPinFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [profileForm, setProfileForm] = useState({ name: profile.name || '', nickname: profile.nickname || '', useNickname: profile.useNickname || false, avatar: profile.avatar || '' });
   const [goalsForm, setGoalsForm] = useState({
     dailyMissionGoal: parentSettings.dailyMissionGoal,
@@ -204,6 +208,21 @@ const Parent = () => {
     rejectPurchase(itemId);
   };
 
+  const handleChangePin = () => {
+    if (!requireOnline(isOnline, 'alterar PIN')) return;
+
+    if (pinForm.newPin !== pinForm.confirmPin) {
+      setPinFeedback({ type: 'error', text: 'A confirmação do PIN não confere.' });
+      return;
+    }
+
+    const result = changeParentPin(pinForm.currentPin, pinForm.newPin);
+    setPinFeedback({ type: result.success ? 'success' : 'error', text: result.message });
+    if (result.success) {
+      setPinForm({ currentPin: '', newPin: '', confirmPin: '' });
+    }
+  };
+
   return (
     <div className={`parent parent--${user.genderTheme}`}>
       {/* Shapes decorativos elegantes */}
@@ -215,6 +234,13 @@ const Parent = () => {
       <div className="parent__header">
         <h1>👨‍👩‍👧‍👦 Painel dos Pais</h1>
         <p>Gerencie as missões, recompensas e acompanhe o progresso</p>
+        <button
+          className="btn btn-secondary"
+          onClick={lockParentAccess}
+          type="button"
+        >
+          🔐 Bloquear painel
+        </button>
       </div>
 
       {/* Section Tabs */}
@@ -1177,6 +1203,66 @@ const Parent = () => {
               <div className="info-content">
                 <h4>Dica</h4>
                 <p>Você pode desativar temporariamente qualquer funcionalidade que esteja distraindo ou que não seja apropriada para o momento atual da criança.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="settings-info">
+            <div className="info-card">
+              <span className="info-icon">🛡️</span>
+              <div className="info-content">
+                <h4>Segurança parental</h4>
+                <p>Altere o PIN de acesso do painel. Use entre 4 e 8 números.</p>
+                <div className="form-grid">
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={pinForm.currentPin}
+                    onChange={(event) =>
+                      setPinForm((prev) => ({
+                        ...prev,
+                        currentPin: event.target.value.replace(/\D/g, '').slice(0, 8)
+                      }))
+                    }
+                    placeholder="PIN atual"
+                    className="form-input"
+                  />
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={pinForm.newPin}
+                    onChange={(event) =>
+                      setPinForm((prev) => ({
+                        ...prev,
+                        newPin: event.target.value.replace(/\D/g, '').slice(0, 8)
+                      }))
+                    }
+                    placeholder="Novo PIN"
+                    className="form-input"
+                  />
+                  <input
+                    type="password"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={pinForm.confirmPin}
+                    onChange={(event) =>
+                      setPinForm((prev) => ({
+                        ...prev,
+                        confirmPin: event.target.value.replace(/\D/g, '').slice(0, 8)
+                      }))
+                    }
+                    placeholder="Confirmar novo PIN"
+                    className="form-input"
+                  />
+                </div>
+                <button className="btn btn-primary" onClick={handleChangePin} type="button">
+                  Atualizar PIN
+                </button>
+                {pinFeedback && (
+                  <p className={`pin-feedback pin-feedback--${pinFeedback.type}`}>{pinFeedback.text}</p>
+                )}
               </div>
             </div>
           </div>

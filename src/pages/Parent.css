@@ -507,6 +507,19 @@
   margin-top: 1rem;
 }
 
+.pin-feedback {
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+.pin-feedback--success {
+  color: #22c55e;
+}
+
+.pin-feedback--error {
+  color: #ef4444;
+}
+
 .info-card {
   display: flex;
   align-items: flex-start;
