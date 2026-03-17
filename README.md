@@ -20,6 +20,7 @@ Aplicação web infantil para rotina de missões, recompensas e acompanhamento p
 ```bash
 npm install
 npm run dev
+npm run cloud:setup
 npm run lint
 npm run test
 npm run build
@@ -43,7 +44,16 @@ npm run build
 
 Workflow em `.github/workflows/ci.yml` com:
 
-1. `npm ci`
+1. `npm ci --cache .npm-cache --prefer-offline --no-audit`
 2. `npm run lint`
 3. `npm run test`
 4. `npm run build`
+
+## Ambiente cloud (bootstrap)
+
+- Versão de Node fixada em:
+  - `.nvmrc`
+  - `.node-version`
+- Cache local de npm configurado em `.npmrc` (`.npm-cache`)
+- Script de pré-instalação para agentes cloud:
+  - `npm run cloud:setup`

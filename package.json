@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "vite --host",
+    "cloud:setup": "bash ./scripts/cloud-bootstrap.sh",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest",
