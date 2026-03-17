@@ -30,8 +30,32 @@ export interface SpeechRecognitionOptions {
   maxAlternatives?: number;
 }
 
+interface SpeechRecognitionErrorEvent {
+  error: string;
+}
+
+interface SpeechRecognitionInstance {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  maxAlternatives: number;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+}
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
+type WindowWithSpeechRecognition = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
 export class SpeechToTextHelper {
-  private recognition: any = null;
+  private recognition: SpeechRecognitionInstance | null = null;
   private isSupported: boolean = false;
 
   constructor() {
@@ -39,7 +63,9 @@ export class SpeechToTextHelper {
   }
 
   private checkSupport(): void {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const speechWindow = window as WindowWithSpeechRecognition;
+    const SpeechRecognition =
+      speechWindow.SpeechRecognition || speechWindow.webkitSpeechRecognition;
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
       this.isSupported = true;
@@ -65,9 +91,9 @@ export class SpeechToTextHelper {
 
       // Configurar opções
       this.recognition.lang = options.language || 'pt-BR';
-      this.recognition.continuous = options.continuous || false;
-      this.recognition.interimResults = options.interimResults || true;
-      this.recognition.maxAlternatives = options.maxAlternatives || 1;
+      this.recognition.continuous = options.continuous ?? false;
+      this.recognition.interimResults = options.interimResults ?? true;
+      this.recognition.maxAlternatives = options.maxAlternatives ?? 1;
 
       // Event handlers
       this.recognition.onresult = (event: SpeechRecognitionEvent) => {
@@ -78,7 +104,7 @@ export class SpeechToTextHelper {
         callback(transcript, isFinal);
       };
 
-      this.recognition.onerror = (event: any) => {
+      this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
         console.error('Speech Recognition error:', event.error);
         reject(new Error(`Speech Recognition error: ${event.error}`));
       };
@@ -91,7 +117,7 @@ export class SpeechToTextHelper {
       try {
         this.recognition.start();
       } catch (error) {
-        reject(error);
+        reject(error instanceof Error ? error : new Error('Falha ao iniciar reconhecimento de voz'));
       }
     });
   }

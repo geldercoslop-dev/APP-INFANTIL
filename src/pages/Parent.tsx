@@ -7,6 +7,7 @@ import { requireOnline } from '../utils/offlineGuard';
 import { getLocalISODate } from '../utils/dateUtils';
 import { DAY_OF_WEEK_LABELS } from '../types/schoolSchedule';
 import type { DayOfWeek } from '../types/schoolSchedule';
+import type { ParentConfig, RealReward, SchoolSchedule } from '../types';
 import './Parent.css';
 
 const Parent = () => {
@@ -80,14 +81,14 @@ const Parent = () => {
     }
   };
 
-  const handleUpdateMission = (id: string, updates: any) => {
+  const handleUpdateMission = (id: string, updates: Partial<ParentConfig['dailyMissionTemplates'][number]>) => {
     if (!requireOnline(isOnline, 'atualizar missão')) return;
     
     updateDailyMissionTemplate(id, updates);
     setEditingMission(null);
   };
 
-  const handleUpdateReward = (id: string, updates: any) => {
+  const handleUpdateReward = (id: string, updates: Partial<RealReward>) => {
     if (!requireOnline(isOnline, 'atualizar recompensa')) return;
     
     updateRealReward(id, updates);
@@ -106,7 +107,7 @@ const Parent = () => {
     }
   };
 
-  const handleEditSchedule = (schedule: any) => {
+  const handleEditSchedule = (schedule: SchoolSchedule) => {
     if (!requireOnline(isOnline, 'editar agenda escolar')) return;
     
     setEditingSchedule(schedule.id);

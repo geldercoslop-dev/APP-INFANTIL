@@ -30,7 +30,7 @@ const Challenges = () => {
     try {
       const result = await claimWeeklyChallengeReward(challengeKey);
       setMessage({ type: 'success', text: result.message });
-    } catch (error) {
+    } catch {
       setMessage({ type: 'error', text: 'Erro ao resgatar recompensa' });
     }
     

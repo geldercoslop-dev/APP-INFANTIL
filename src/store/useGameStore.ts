@@ -47,6 +47,39 @@ import type {
   DiaryEntry
 } from '../types/DiaryEntry';
 
+type LegacyShopInventoryItem = {
+  equipped?: boolean;
+  [key: string]: unknown;
+};
+
+type LegacyWeeklyChallenge = {
+  progress: number;
+  goal: number;
+  [key: string]: unknown;
+};
+
+type BackupImportData = {
+  user?: User;
+  profile?: UserProfile;
+  missions?: Record<string, Mission[]>;
+  moods?: Record<string, DailyMood>;
+  achievements?: Record<AchievementKey, Achievement | null>;
+  dailyProgress?: Record<string, DailyProgress>;
+  totalMissionsCompleted?: number;
+  parentConfig?: ParentConfig;
+  inventory?: InventoryState;
+  redeemedRewards?: string[];
+  shopInventory?: Record<string, LegacyShopInventoryItem>;
+  equippedItems?: string[];
+  moodEntries?: Record<string, MoodEntry>;
+  schoolEntries?: Record<string, SchoolEntry>;
+  diaryEntries?: Record<string, DiaryEntry>;
+  weeklyChallenges?: WeeklyChallengesState;
+  lastDailyBonusDate?: string | null;
+  parentSettings?: GameState['parentSettings'];
+  schoolSchedule?: SchoolScheduleState;
+};
+
 interface GameState {
   // User profile
   user: User;
@@ -59,7 +92,7 @@ interface GameState {
   diaryEntries: Record<string, DiaryEntry>; // date -> diary entry
   
   // Shop and inventory
-  shopInventory: Record<string, any>; // itemId -> inventory item
+  shopInventory: Record<string, LegacyShopInventoryItem>; // legado de inventário antigo
   equippedItems: string[]; // itemIds currently equipped
   inventory: InventoryState; // owned and equipped items
   
@@ -272,7 +305,7 @@ interface GameState {
   
   // Backup actions
   exportState: () => string;
-  importState: (data: any) => void;
+  importState: (data: unknown) => void;
   
   // School schedule actions
   getSchoolSchedule: () => SchoolSchedule[];
@@ -588,7 +621,7 @@ export const useGameStore = create<GameState>()(
           const challenges = state.weeklyChallenges[currentWeekId];
           Object.entries(challenges).forEach(([key, challenge]) => {
             if (typeof challenge === 'object' && challenge !== null && 'progress' in challenge && 'goal' in challenge) {
-              const typedChallenge = challenge as any;
+              const typedChallenge = challenge as LegacyWeeklyChallenge;
               if (typedChallenge.progress > typedChallenge.goal) {
                 set((prevState) => ({
                   weeklyChallenges: {
@@ -1698,45 +1731,46 @@ export const useGameStore = create<GameState>()(
         }, null, 2);
       },
 
-      importState: (data: any) => {
+      importState: (data: unknown) => {
         try {
           // Validate basic structure
           if (!data || typeof data !== 'object') {
             throw new Error('Dados inválidos');
           }
+          const importedData = data as BackupImportData;
           
-          if (!data.user || !data.profile || !data.moods) {
+          if (!importedData.user || !importedData.profile || !importedData.moods) {
             throw new Error('Estrutura de dados incompleta');
           }
 
           // Import all data
           set(() => ({
-            user: data.user,
-            profile: data.profile,
-            missions: data.missions || {},
-            moods: data.moods || {},
-            achievements: data.achievements || defaultAchievements,
-            dailyProgress: data.dailyProgress || {},
-            totalMissionsCompleted: data.totalMissionsCompleted || 0,
-            parentConfig: data.parentConfig || defaultParentConfig,
-            inventory: data.inventory || { ownedItemIds: {}, equippedByCategory: {} },
-            redeemedRewards: data.redeemedRewards || [],
-            shopInventory: data.shopInventory || {},
-            equippedItems: data.equippedItems || [],
-            moodEntries: data.moodEntries || {},
-            schoolEntries: data.schoolEntries || {},
-            diaryEntries: data.diaryEntries || {},
+            user: importedData.user,
+            profile: importedData.profile,
+            missions: importedData.missions || {},
+            moods: importedData.moods || {},
+            achievements: importedData.achievements || defaultAchievements,
+            dailyProgress: importedData.dailyProgress || {},
+            totalMissionsCompleted: importedData.totalMissionsCompleted || 0,
+            parentConfig: importedData.parentConfig || defaultParentConfig,
+            inventory: importedData.inventory || { ownedItemIds: {}, equippedByCategory: {} },
+            redeemedRewards: importedData.redeemedRewards || [],
+            shopInventory: importedData.shopInventory || {},
+            equippedItems: importedData.equippedItems || [],
+            moodEntries: importedData.moodEntries || {},
+            schoolEntries: importedData.schoolEntries || {},
+            diaryEntries: importedData.diaryEntries || {},
             mascotToastMessage: null,
             achievementToast: null,
-            weeklyChallenges: data.weeklyChallenges || {},
-            lastDailyBonusDate: data.lastDailyBonusDate || null,
-            parentSettings: data.parentSettings || {
+            weeklyChallenges: importedData.weeklyChallenges || {},
+            lastDailyBonusDate: importedData.lastDailyBonusDate || null,
+            parentSettings: importedData.parentSettings || {
               dailyBonusEnabled: true,
               weeklyChallengesEnabled: true,
               mascotMessagesEnabled: true,
               seasonalThemeEnabled: true
             },
-            schoolSchedule: data.schoolSchedule || { schedules: [] }
+            schoolSchedule: importedData.schoolSchedule || { schedules: [] }
           }));
           
           // Rebuild dailyProgress if missing

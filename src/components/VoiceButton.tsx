@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { startSpeechRecognition, isSpeechRecognitionSupported } from '../utils/speechToText';
 
 interface VoiceButtonProps {
@@ -17,12 +17,8 @@ const VoiceButton: React.FC<VoiceButtonProps> = ({
   size = 'medium'
 }) => {
   const [isListening, setIsListening] = useState(false);
-  const [isSupported, setIsSupported] = useState(false);
+  const [isSupported] = useState(() => isSpeechRecognitionSupported());
   const [interimTranscript, setInterimTranscript] = useState('');
-
-  useEffect(() => {
-    setIsSupported(isSpeechRecognitionSupported());
-  }, []);
 
   const handleStartListening = async () => {
     if (!isSupported || disabled) return;

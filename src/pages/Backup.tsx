@@ -22,7 +22,7 @@ const Backup = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
       setImportError('Erro ao exportar backup');
       setTimeout(() => setImportError(''), 3000);
     }
@@ -47,7 +47,7 @@ const Backup = () => {
           setImportSuccess('Backup importado com sucesso!');
           setTimeout(() => setImportSuccess(''), 3000);
         }
-      } catch (error) {
+      } catch {
         setImportError('Arquivo inválido ou corrompido');
         setTimeout(() => setImportError(''), 3000);
       } finally {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Confetti from './Confetti';
 import './LevelUpCelebration.css';
 
@@ -11,24 +11,28 @@ const LevelUpCelebration: React.FC<LevelUpCelebrationProps> = ({ newLevel, onCom
   const [isVisible, setIsVisible] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
 
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setShowConfetti(false);
+    setTimeout(onComplete, 300);
+  }, [onComplete]);
+
   useEffect(() => {
     // Iniciar animação
-    setTimeout(() => setIsVisible(true), 100);
-    setTimeout(() => setShowConfetti(true), 300);
+    const visibleTimer = setTimeout(() => setIsVisible(true), 100);
+    const confettiTimer = setTimeout(() => setShowConfetti(true), 300);
     
     // Auto-fechar após 5 segundos
     const timer = setTimeout(() => {
       handleClose();
     }, 5000);
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setShowConfetti(false);
-    setTimeout(onComplete, 300);
-  };
+    return () => {
+      clearTimeout(visibleTimer);
+      clearTimeout(confettiTimer);
+      clearTimeout(timer);
+    };
+  }, [handleClose]);
 
   return (
     <>

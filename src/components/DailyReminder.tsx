@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getDailyReminderMessage } from '../utils/dailyMessages';
 import './DailyReminder.css';
 
@@ -10,22 +10,25 @@ const DailyReminder: React.FC<DailyReminderProps> = ({ onComplete }) => {
   const [isVisible, setIsVisible] = useState(false);
   const reminderMessage = getDailyReminderMessage();
 
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    setTimeout(onComplete, 300);
+  }, [onComplete]);
+
   useEffect(() => {
     // Animar entrada
-    setTimeout(() => setIsVisible(true), 100);
+    const showTimer = setTimeout(() => setIsVisible(true), 100);
     
     // Auto-fechar após 3 segundos
     const timer = setTimeout(() => {
       handleClose();
     }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(onComplete, 300);
-  };
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(timer);
+    };
+  }, [handleClose]);
 
   return (
     <div className={`daily-reminder ${isVisible ? 'visible' : ''}`}>
