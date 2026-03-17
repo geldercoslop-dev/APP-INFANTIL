@@ -6,20 +6,18 @@ interface ConfettiProps {
   duration?: number;
 }
 
-const Confetti: React.FC<ConfettiProps> = ({ trigger, duration = 3000 }) => {
-  const particles = useMemo(() => {
-    if (!trigger) {
-      return [];
-    }
+const STATIC_PARTICLES = Array.from({ length: 50 }, (_, i) => {
+  const colors = ['#22c55e', '#fbbf24', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
+  return {
+    id: i + 1,
+    left: Math.random() * 100,
+    delay: Math.random() * 0.5,
+    color: colors[Math.floor(Math.random() * colors.length)],
+  };
+});
 
-    const colors = ['#22c55e', '#fbbf24', '#3b82f6', '#f59e0b', '#8b5cf6', '#ef4444'];
-    return Array.from({ length: 50 }, (_, i) => ({
-      id: Date.now() + i,
-      left: Math.random() * 100,
-      delay: Math.random() * 0.5,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }));
-  }, [trigger]);
+const Confetti: React.FC<ConfettiProps> = ({ trigger, duration = 3000 }) => {
+  const particles = useMemo(() => (trigger ? STATIC_PARTICLES : []), [trigger]);
 
   if (!trigger || particles.length === 0) return null;
 

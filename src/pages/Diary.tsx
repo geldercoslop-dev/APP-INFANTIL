@@ -74,7 +74,7 @@ const Diary = () => {
     }
   };
 
-  const moodOptions = [
+  const moodOptions: Array<{ key: MoodKey; emoji: string; label: string }> = [
     { key: 'happy', emoji: '😀', label: 'Feliz' },
     { key: 'tired', emoji: '😴', label: 'Cansado' },
     { key: 'sad', emoji: '😢', label: 'Triste' },

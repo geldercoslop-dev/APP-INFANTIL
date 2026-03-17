@@ -21,7 +21,9 @@ export class AudioSystem {
         webkitAudioContext?: typeof AudioContext;
       };
       const audioWindow = window as WindowWithWebkitAudio;
-      const AudioContextCtor = audioWindow.AudioContext ?? audioWindow.webkitAudioContext;
+      const AudioContextCtor =
+        audioWindow.webkitAudioContext ??
+        (globalThis as typeof globalThis & { AudioContext?: typeof AudioContext }).AudioContext;
       if (!AudioContextCtor) {
         throw new Error('AudioContext indisponível');
       }

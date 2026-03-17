@@ -76,7 +76,7 @@ type BackupImportData = {
   diaryEntries?: Record<string, DiaryEntry>;
   weeklyChallenges?: WeeklyChallengesState;
   lastDailyBonusDate?: string | null;
-  parentSettings?: GameState['parentSettings'];
+  parentSettings?: Partial<GameState['parentSettings']>;
   schoolSchedule?: SchoolScheduleState;
 };
 
@@ -354,6 +354,18 @@ const defaultParentConfig: ParentConfig = {
   realRewards: []
 };
 
+const defaultParentSettings: GameState['parentSettings'] = {
+  dailyBonusEnabled: true,
+  weeklyChallengesEnabled: true,
+  mascotMessagesEnabled: true,
+  seasonalThemeEnabled: true,
+  purchaseApprovalRequired: false,
+  dailyMissionGoal: 5,
+  dailyCoinLimit: 100,
+  weeklyGoal: 'complete_all_challenges',
+  soundEnabled: true
+};
+
 const defaultAchievements: Record<AchievementKey, Achievement | null> = {
   first_mission: null,
   streak_3: null,
@@ -417,17 +429,7 @@ export const useGameStore = create<GameState>()(
       weeklyChallenges: {},
       lastDailyBonusDate: null,
       dailyBonusMission: null,
-      parentSettings: {
-        dailyBonusEnabled: true,
-        weeklyChallengesEnabled: true,
-        mascotMessagesEnabled: true,
-        seasonalThemeEnabled: true,
-        purchaseApprovalRequired: false,
-        dailyMissionGoal: 5,
-        dailyCoinLimit: 100,
-        weeklyGoal: 'complete_all_challenges',
-        soundEnabled: true
-      },
+      parentSettings: defaultParentSettings,
       schoolSchedule: { schedules: [] },
       weeklyResetDate: null,
       pendingPurchases: {},
@@ -1764,12 +1766,7 @@ export const useGameStore = create<GameState>()(
             achievementToast: null,
             weeklyChallenges: importedData.weeklyChallenges || {},
             lastDailyBonusDate: importedData.lastDailyBonusDate || null,
-            parentSettings: importedData.parentSettings || {
-              dailyBonusEnabled: true,
-              weeklyChallengesEnabled: true,
-              mascotMessagesEnabled: true,
-              seasonalThemeEnabled: true
-            },
+            parentSettings: { ...defaultParentSettings, ...importedData.parentSettings },
             schoolSchedule: importedData.schoolSchedule || { schedules: [] }
           }));
           

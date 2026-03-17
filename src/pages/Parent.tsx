@@ -7,7 +7,7 @@ import { requireOnline } from '../utils/offlineGuard';
 import { getLocalISODate } from '../utils/dateUtils';
 import { DAY_OF_WEEK_LABELS } from '../types/schoolSchedule';
 import type { DayOfWeek } from '../types/schoolSchedule';
-import type { ParentConfig, RealReward, SchoolSchedule } from '../types';
+import type { ParentConfig, RealReward, SchoolSchedule, SchoolSubject } from '../types';
 import './Parent.css';
 
 const Parent = () => {
@@ -42,7 +42,10 @@ const Parent = () => {
   const [editingSchedule, setEditingSchedule] = useState<string | null>(null);
   const [newMission, setNewMission] = useState({ title: '', description: '', xp: 10, coins: 5, emoji: '📝' });
   const [newReward, setNewReward] = useState({ title: '', description: '', cost: 50, emoji: '🎁' });
-  const [newSchedule, setNewSchedule] = useState({ dayOfWeek: 'monday' as DayOfWeek, subjects: [{ id: '1', name: 'Matemática', emoji: '🔢', time: '' }] });
+  const [newSchedule, setNewSchedule] = useState<{ dayOfWeek: DayOfWeek; subjects: SchoolSubject[] }>({
+    dayOfWeek: 'monday',
+    subjects: [{ id: '1', name: 'Matemática', emoji: '🔢', time: '' }],
+  });
   const [showMissionForm, setShowMissionForm] = useState(false);
   const [showRewardForm, setShowRewardForm] = useState(false);
   const [showScheduleForm, setShowScheduleForm] = useState(false);
