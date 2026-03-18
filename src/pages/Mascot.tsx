@@ -38,24 +38,30 @@ const Mascot = () => {
 
   // Get equipped pet for special display
   const equippedPet = getEquippedItem('pet');
+  const equippedPetId = equippedPet?.id;
 
   // Generate random pet message on mount and when pet changes
   useEffect(() => {
-    if (equippedPet) {
-      const randomMessage = PET_MESSAGES[Math.floor(Math.random() * PET_MESSAGES.length)];
-      setTimeout(() => {
-        setPetMessage(randomMessage);
-        setShowMessage(true);
-      }, 0);
-      
-      // Hide message after 5 seconds
-      const timer = setTimeout(() => {
-        setShowMessage(false);
-      }, 5000);
-      
-      return () => clearTimeout(timer);
+    if (!equippedPetId) {
+      return;
     }
-  }, [equippedPet?.id]);
+
+    const randomMessage = PET_MESSAGES[Math.floor(Math.random() * PET_MESSAGES.length)];
+    const showTimer = setTimeout(() => {
+      setPetMessage(randomMessage);
+      setShowMessage(true);
+    }, 0);
+    
+    // Hide message after 5 seconds
+    const timer = setTimeout(() => {
+      setShowMessage(false);
+    }, 5000);
+    
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(timer);
+    };
+  }, [equippedPetId]);
 
   const handleMascotSelect = (mascotId: string) => {
     if (!requireOnline(isOnline, 'selecionar mascote')) return;

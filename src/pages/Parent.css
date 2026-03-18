@@ -179,8 +179,6 @@
   margin: 0.25rem 0 0 0;
   font-weight: 500;
 }
-  margin-bottom: 2rem;
-}
 
 .summary-card {
   background: rgba(255, 255, 255, 0.15);
@@ -507,6 +505,19 @@
 
 .settings-info {
   margin-top: 1rem;
+}
+
+.pin-feedback {
+  margin-top: 0.75rem;
+  font-weight: 600;
+}
+
+.pin-feedback--success {
+  color: #22c55e;
+}
+
+.pin-feedback--error {
+  color: #ef4444;
 }
 
 .info-card {

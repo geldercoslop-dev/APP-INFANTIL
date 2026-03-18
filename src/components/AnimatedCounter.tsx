@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './AnimatedCounter.css';
 
 interface AnimatedCounterProps {
@@ -17,40 +17,39 @@ const AnimatedCounter = ({
   className = ''
 }: AnimatedCounterProps) => {
   const [displayValue, setDisplayValue] = useState(value);
-  const [isAnimating, setIsAnimating] = useState(false);
+  const currentValueRef = useRef(value);
 
   useEffect(() => {
-    if (displayValue !== value) {
-      setIsAnimating(true);
-      
-      const startValue = displayValue;
-      const endValue = value;
-      const startTime = Date.now();
-      
-      const animate = () => {
-        const now = Date.now();
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        // Easing function for smooth animation
-        const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-        const currentValue = Math.floor(startValue + (endValue - startValue) * easeOutQuart);
-        
-        setDisplayValue(currentValue);
-        
-        if (progress < 1) {
-          requestAnimationFrame(animate);
-        } else {
-          setIsAnimating(false);
-        }
-      };
-      
-      requestAnimationFrame(animate);
+    if (currentValueRef.current === value) {
+      return;
     }
-  }, [value, displayValue, duration]);
+
+    const startValue = currentValueRef.current;
+    const endValue = value;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const now = Date.now();
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+
+      // Easing function for smooth animation
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      const currentValue = Math.floor(startValue + (endValue - startValue) * easeOutQuart);
+
+      currentValueRef.current = currentValue;
+      setDisplayValue(currentValue);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [value, duration]);
 
   return (
-    <span className={`animated-counter ${isAnimating ? 'counter--animating' : ''} ${className}`}>
+    <span className={`animated-counter ${displayValue !== value ? 'counter--animating' : ''} ${className}`}>
       {prefix}{displayValue}{suffix}
     </span>
   );

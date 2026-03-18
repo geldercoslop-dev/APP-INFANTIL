@@ -47,6 +47,47 @@ import type {
   DiaryEntry
 } from '../types/DiaryEntry';
 
+type LegacyShopInventoryItem = {
+  equipped?: boolean;
+  [key: string]: unknown;
+};
+
+type LegacyWeeklyChallenge = {
+  progress: number;
+  goal: number;
+  [key: string]: unknown;
+};
+
+type ParentSecurity = {
+  pin: string;
+  unlockedUntil: number | null;
+  failedAttempts: number;
+  lockedUntil: number | null;
+};
+
+type BackupImportData = {
+  user?: User;
+  profile?: UserProfile;
+  missions?: Record<string, Mission[]>;
+  moods?: Record<string, DailyMood>;
+  achievements?: Record<AchievementKey, Achievement | null>;
+  dailyProgress?: Record<string, DailyProgress>;
+  totalMissionsCompleted?: number;
+  parentConfig?: ParentConfig;
+  inventory?: InventoryState;
+  redeemedRewards?: string[];
+  shopInventory?: Record<string, LegacyShopInventoryItem>;
+  equippedItems?: string[];
+  moodEntries?: Record<string, MoodEntry>;
+  schoolEntries?: Record<string, SchoolEntry>;
+  diaryEntries?: Record<string, DiaryEntry>;
+  weeklyChallenges?: WeeklyChallengesState;
+  lastDailyBonusDate?: string | null;
+  parentSettings?: Partial<GameState['parentSettings']>;
+  parentSecurity?: Partial<ParentSecurity>;
+  schoolSchedule?: SchoolScheduleState;
+};
+
 interface GameState {
   // User profile
   user: User;
@@ -59,7 +100,7 @@ interface GameState {
   diaryEntries: Record<string, DiaryEntry>; // date -> diary entry
   
   // Shop and inventory
-  shopInventory: Record<string, any>; // itemId -> inventory item
+  shopInventory: Record<string, LegacyShopInventoryItem>; // legado de inventário antigo
   equippedItems: string[]; // itemIds currently equipped
   inventory: InventoryState; // owned and equipped items
   
@@ -124,6 +165,9 @@ interface GameState {
     weeklyGoal: string;
     soundEnabled: boolean;
   };
+
+  // Parent access control
+  parentSecurity: ParentSecurity;
   
   // School schedule
   schoolSchedule: SchoolScheduleState;
@@ -228,6 +272,10 @@ interface GameState {
   
   // Parent settings actions
   updateParentSettings: (settings: Partial<GameState['parentSettings']>) => void;
+  isParentAccessUnlocked: () => boolean;
+  unlockParentAccess: (pin: string) => { success: boolean; message: string };
+  lockParentAccess: () => void;
+  changeParentPin: (currentPin: string, newPin: string) => { success: boolean; message: string };
   
   // Shop actions
   buyItem: (itemId: string) => Promise<{ success: boolean; message: string }>;
@@ -272,7 +320,7 @@ interface GameState {
   
   // Backup actions
   exportState: () => string;
-  importState: (data: any) => void;
+  importState: (data: unknown) => void;
   
   // School schedule actions
   getSchoolSchedule: () => SchoolSchedule[];
@@ -319,6 +367,25 @@ const defaultProfile: UserProfile = {
 const defaultParentConfig: ParentConfig = {
   dailyMissionTemplates: [],
   realRewards: []
+};
+
+const defaultParentSettings: GameState['parentSettings'] = {
+  dailyBonusEnabled: true,
+  weeklyChallengesEnabled: true,
+  mascotMessagesEnabled: true,
+  seasonalThemeEnabled: true,
+  purchaseApprovalRequired: false,
+  dailyMissionGoal: 5,
+  dailyCoinLimit: 100,
+  weeklyGoal: 'complete_all_challenges',
+  soundEnabled: true
+};
+
+const defaultParentSecurity: ParentSecurity = {
+  pin: '1234',
+  unlockedUntil: null,
+  failedAttempts: 0,
+  lockedUntil: null
 };
 
 const defaultAchievements: Record<AchievementKey, Achievement | null> = {
@@ -384,17 +451,8 @@ export const useGameStore = create<GameState>()(
       weeklyChallenges: {},
       lastDailyBonusDate: null,
       dailyBonusMission: null,
-      parentSettings: {
-        dailyBonusEnabled: true,
-        weeklyChallengesEnabled: true,
-        mascotMessagesEnabled: true,
-        seasonalThemeEnabled: true,
-        purchaseApprovalRequired: false,
-        dailyMissionGoal: 5,
-        dailyCoinLimit: 100,
-        weeklyGoal: 'complete_all_challenges',
-        soundEnabled: true
-      },
+      parentSettings: defaultParentSettings,
+      parentSecurity: defaultParentSecurity,
       schoolSchedule: { schedules: [] },
       weeklyResetDate: null,
       pendingPurchases: {},
@@ -588,7 +646,7 @@ export const useGameStore = create<GameState>()(
           const challenges = state.weeklyChallenges[currentWeekId];
           Object.entries(challenges).forEach(([key, challenge]) => {
             if (typeof challenge === 'object' && challenge !== null && 'progress' in challenge && 'goal' in challenge) {
-              const typedChallenge = challenge as any;
+              const typedChallenge = challenge as LegacyWeeklyChallenge;
               if (typedChallenge.progress > typedChallenge.goal) {
                 set((prevState) => ({
                   weeklyChallenges: {
@@ -1694,49 +1752,62 @@ export const useGameStore = create<GameState>()(
           weeklyChallenges: state.weeklyChallenges,
           lastDailyBonusDate: state.lastDailyBonusDate,
           parentSettings: state.parentSettings,
+          parentSecurity: state.parentSecurity,
           schoolSchedule: state.schoolSchedule
         }, null, 2);
       },
 
-      importState: (data: any) => {
+      importState: (data: unknown) => {
         try {
           // Validate basic structure
           if (!data || typeof data !== 'object') {
             throw new Error('Dados inválidos');
           }
+          const importedData = data as BackupImportData;
           
-          if (!data.user || !data.profile || !data.moods) {
+          if (!importedData.user || !importedData.profile || !importedData.moods) {
             throw new Error('Estrutura de dados incompleta');
           }
+          const importedParentSecurity = importedData.parentSecurity || {};
+          const mergedParentSecurity: ParentSecurity = {
+            ...defaultParentSecurity,
+            ...importedParentSecurity,
+            pin: typeof importedParentSecurity.pin === 'string' && /^\d{4,8}$/.test(importedParentSecurity.pin)
+              ? importedParentSecurity.pin
+              : defaultParentSecurity.pin,
+            unlockedUntil: null,
+            lockedUntil:
+              typeof importedParentSecurity.lockedUntil === 'number' ? importedParentSecurity.lockedUntil : null,
+            failedAttempts:
+              typeof importedParentSecurity.failedAttempts === 'number'
+                ? Math.max(0, Math.floor(importedParentSecurity.failedAttempts))
+                : 0
+          };
 
           // Import all data
           set(() => ({
-            user: data.user,
-            profile: data.profile,
-            missions: data.missions || {},
-            moods: data.moods || {},
-            achievements: data.achievements || defaultAchievements,
-            dailyProgress: data.dailyProgress || {},
-            totalMissionsCompleted: data.totalMissionsCompleted || 0,
-            parentConfig: data.parentConfig || defaultParentConfig,
-            inventory: data.inventory || { ownedItemIds: {}, equippedByCategory: {} },
-            redeemedRewards: data.redeemedRewards || [],
-            shopInventory: data.shopInventory || {},
-            equippedItems: data.equippedItems || [],
-            moodEntries: data.moodEntries || {},
-            schoolEntries: data.schoolEntries || {},
-            diaryEntries: data.diaryEntries || {},
+            user: importedData.user,
+            profile: importedData.profile,
+            missions: importedData.missions || {},
+            moods: importedData.moods || {},
+            achievements: importedData.achievements || defaultAchievements,
+            dailyProgress: importedData.dailyProgress || {},
+            totalMissionsCompleted: importedData.totalMissionsCompleted || 0,
+            parentConfig: importedData.parentConfig || defaultParentConfig,
+            inventory: importedData.inventory || { ownedItemIds: {}, equippedByCategory: {} },
+            redeemedRewards: importedData.redeemedRewards || [],
+            shopInventory: importedData.shopInventory || {},
+            equippedItems: importedData.equippedItems || [],
+            moodEntries: importedData.moodEntries || {},
+            schoolEntries: importedData.schoolEntries || {},
+            diaryEntries: importedData.diaryEntries || {},
             mascotToastMessage: null,
             achievementToast: null,
-            weeklyChallenges: data.weeklyChallenges || {},
-            lastDailyBonusDate: data.lastDailyBonusDate || null,
-            parentSettings: data.parentSettings || {
-              dailyBonusEnabled: true,
-              weeklyChallengesEnabled: true,
-              mascotMessagesEnabled: true,
-              seasonalThemeEnabled: true
-            },
-            schoolSchedule: data.schoolSchedule || { schedules: [] }
+            weeklyChallenges: importedData.weeklyChallenges || {},
+            lastDailyBonusDate: importedData.lastDailyBonusDate || null,
+            parentSettings: { ...defaultParentSettings, ...importedData.parentSettings },
+            parentSecurity: mergedParentSecurity,
+            schoolSchedule: importedData.schoolSchedule || { schedules: [] }
           }));
           
           // Rebuild dailyProgress if missing
@@ -2187,6 +2258,91 @@ export const useGameStore = create<GameState>()(
         set((state) => ({
           parentSettings: { ...state.parentSettings, ...settings }
         }));
+      },
+
+      isParentAccessUnlocked: () => {
+        const { parentSecurity } = get();
+        if (!parentSecurity.unlockedUntil) {
+          return false;
+        }
+
+        return Date.now() < parentSecurity.unlockedUntil;
+      },
+
+      unlockParentAccess: (pin) => {
+        const state = get();
+        const now = Date.now();
+        const normalizedPin = pin.trim();
+
+        if (state.parentSecurity.lockedUntil && now < state.parentSecurity.lockedUntil) {
+          const remainingSeconds = Math.ceil((state.parentSecurity.lockedUntil - now) / 1000);
+          return {
+            success: false,
+            message: `Painel bloqueado temporariamente. Tente em ${remainingSeconds}s.`
+          };
+        }
+
+        if (normalizedPin === state.parentSecurity.pin) {
+          set((prevState) => ({
+            parentSecurity: {
+              ...prevState.parentSecurity,
+              failedAttempts: 0,
+              lockedUntil: null,
+              unlockedUntil: now + 10 * 60 * 1000
+            }
+          }));
+          return { success: true, message: 'Acesso autorizado.' };
+        }
+
+        const nextFailedAttempts = state.parentSecurity.failedAttempts + 1;
+        const shouldLock = nextFailedAttempts >= 5;
+        set((prevState) => ({
+          parentSecurity: {
+            ...prevState.parentSecurity,
+            failedAttempts: shouldLock ? 0 : nextFailedAttempts,
+            lockedUntil: shouldLock ? now + 5 * 60 * 1000 : null,
+            unlockedUntil: null
+          }
+        }));
+
+        return {
+          success: false,
+          message: shouldLock
+            ? 'Muitas tentativas inválidas. Painel bloqueado por 5 minutos.'
+            : 'PIN incorreto.'
+        };
+      },
+
+      lockParentAccess: () => {
+        set((state) => ({
+          parentSecurity: {
+            ...state.parentSecurity,
+            unlockedUntil: null
+          }
+        }));
+      },
+
+      changeParentPin: (currentPin, newPin) => {
+        const state = get();
+        const normalizedCurrentPin = currentPin.trim();
+        const normalizedNewPin = newPin.trim();
+
+        if (normalizedCurrentPin !== state.parentSecurity.pin) {
+          return { success: false, message: 'PIN atual incorreto.' };
+        }
+
+        if (!/^\d{4,8}$/.test(normalizedNewPin)) {
+          return { success: false, message: 'Novo PIN deve ter entre 4 e 8 dígitos numéricos.' };
+        }
+
+        set((prevState) => ({
+          parentSecurity: {
+            ...prevState.parentSecurity,
+            pin: normalizedNewPin
+          }
+        }));
+
+        return { success: true, message: 'PIN atualizado com sucesso.' };
       },
       
       // School schedule actions

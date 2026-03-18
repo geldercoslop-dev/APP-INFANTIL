@@ -4,6 +4,35 @@ import { getLocalISODate } from '../utils/dateUtils';
 import BackButton from '../components/BackButton';
 import './Page.css';
 
+const isValidBackupPayload = (data: unknown): data is Record<string, unknown> => {
+  if (!data || typeof data !== 'object') {
+    return false;
+  }
+
+  const payload = data as Record<string, unknown>;
+  const hasRequiredBlocks =
+    typeof payload.user === 'object' &&
+    payload.user !== null &&
+    typeof payload.profile === 'object' &&
+    payload.profile !== null &&
+    typeof payload.moods === 'object' &&
+    payload.moods !== null;
+
+  if (!hasRequiredBlocks) {
+    return false;
+  }
+
+  if (payload.parentSettings && typeof payload.parentSettings !== 'object') {
+    return false;
+  }
+
+  if (payload.parentSecurity && typeof payload.parentSecurity !== 'object') {
+    return false;
+  }
+
+  return true;
+};
+
 const Backup = () => {
   const { exportState, importState } = useGameStore();
   const [importError, setImportError] = useState<string>('');
@@ -22,7 +51,7 @@ const Backup = () => {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    } catch (error) {
+    } catch {
       setImportError('Erro ao exportar backup');
       setTimeout(() => setImportError(''), 3000);
     }
@@ -40,6 +69,9 @@ const Backup = () => {
     reader.onload = (e) => {
       try {
         const data = JSON.parse(e.target?.result as string);
+        if (!isValidBackupPayload(data)) {
+          throw new Error('Estrutura inválida');
+        }
         
         // Confirm before importing
         if (confirm('Isso vai substituir seus dados atuais. Tem certeza?')) {
@@ -47,7 +79,7 @@ const Backup = () => {
           setImportSuccess('Backup importado com sucesso!');
           setTimeout(() => setImportSuccess(''), 3000);
         }
-      } catch (error) {
+      } catch {
         setImportError('Arquivo inválido ou corrompido');
         setTimeout(() => setImportError(''), 3000);
       } finally {

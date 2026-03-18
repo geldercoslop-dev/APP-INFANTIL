@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useMemo, useState } from 'react';
 import { useGameStore } from '../store/useGameStore';
-import type { DailyMood } from '../types';
+import type { DailyMood, MoodKey } from '../types';
 import { getLocalISODate } from '../utils/dateUtils';
 import VoiceButton from '../components/VoiceButton';
 import './Page.css';
@@ -8,12 +8,11 @@ import './Diary.css';
 
 const Diary = () => {
   const { moods: storeMoods, getTodayMood, dailyProgress, setMoodForToday } = useGameStore();
-  const [moodHistory, setMoodHistory] = useState<DailyMood[]>([]);
-  const [selectedMood, setSelectedMood] = useState<string>('');
+  const [selectedMood, setSelectedMood] = useState<MoodKey | ''>('');
   const [diaryText, setDiaryText] = useState<string>('');
   const [isAddingEntry, setIsAddingEntry] = useState<boolean>(false);
 
-  useEffect(() => {
+  const moodHistory = useMemo(() => {
     // Get last 7 days of moods
     const today = getLocalISODate();
     const history: DailyMood[] = [];
@@ -28,8 +27,8 @@ const Diary = () => {
         history.push(mood);
       }
     }
-    
-    setMoodHistory(history);
+
+    return history;
   }, [storeMoods]);
 
   const todayMood = getTodayMood();
@@ -65,7 +64,7 @@ const Diary = () => {
     setIsAddingEntry(true);
     
     try {
-      await setMoodForToday(selectedMood as any, diaryText.trim() || '');
+      await setMoodForToday(selectedMood, diaryText.trim() || '');
       setSelectedMood('');
       setDiaryText('');
       setIsAddingEntry(false);
@@ -75,7 +74,7 @@ const Diary = () => {
     }
   };
 
-  const moodOptions = [
+  const moodOptions: Array<{ key: MoodKey; emoji: string; label: string }> = [
     { key: 'happy', emoji: '😀', label: 'Feliz' },
     { key: 'tired', emoji: '😴', label: 'Cansado' },
     { key: 'sad', emoji: '😢', label: 'Triste' },

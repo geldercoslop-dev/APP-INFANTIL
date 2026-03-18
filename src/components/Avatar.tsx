@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './Avatar.css';
 
 interface AvatarProps {
@@ -8,6 +8,8 @@ interface AvatarProps {
 }
 
 const Avatar: React.FC<AvatarProps> = ({ src, fallbackText = '?', size = 'md' }) => {
+  const [hasImageError, setHasImageError] = useState(false);
+
   const getInitial = (text: string) => {
     return text.charAt(0).toUpperCase();
   };
@@ -21,20 +23,12 @@ const Avatar: React.FC<AvatarProps> = ({ src, fallbackText = '?', size = 'md' })
 
   return (
     <div className={`avatar avatar--${size}`}>
-      {src ? (
+      {src && !hasImageError ? (
         <img 
           src={src} 
           alt="Avatar" 
           className="avatar__image"
-          onError={(e) => {
-            // Fallback to text if image fails to load
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            const parent = target.parentElement;
-            if (parent) {
-              parent.innerHTML = `<span class="avatar__fallback">${getFallbackContent()}</span>`;
-            }
-          }}
+          onError={() => setHasImageError(true)}
         />
       ) : (
         <span className="avatar__fallback">

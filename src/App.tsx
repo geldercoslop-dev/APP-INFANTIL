@@ -4,6 +4,7 @@ import AppShell from './components/AppShell';
 import OfflineBanner from './components/OfflineBanner';
 import AchievementToast from './components/AchievementToast';
 import MascotToast from './components/MascotToast';
+import ParentAccessGate from './components/ParentAccessGate';
 import { useGameStore } from './store/useGameStore';
 import { AudioSystem } from './systems/audioSystem';
 import './App.css';
@@ -74,7 +75,14 @@ function App() {
             <Route path="/school" element={<School />} />
             <Route path="/diary" element={<Diary />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/parent" element={<Parent />} />
+            <Route
+              path="/parent"
+              element={
+                <ParentAccessGate>
+                  <Parent />
+                </ParentAccessGate>
+              }
+            />
             <Route path="/mascot" element={<Mascot />} />
             <Route path="/music" element={<Music />} />
             <Route path="/effects" element={<Effects />} />

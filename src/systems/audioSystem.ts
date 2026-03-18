@@ -17,7 +17,17 @@ export class AudioSystem {
     if (this.initialized) return;
     
     try {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      type WindowWithWebkitAudio = Window & {
+        webkitAudioContext?: typeof AudioContext;
+      };
+      const audioWindow = window as WindowWithWebkitAudio;
+      const AudioContextCtor =
+        audioWindow.webkitAudioContext ??
+        (globalThis as typeof globalThis & { AudioContext?: typeof AudioContext }).AudioContext;
+      if (!AudioContextCtor) {
+        throw new Error('AudioContext indisponível');
+      }
+      this.audioContext = new AudioContextCtor();
       this.initialized = true;
     } catch (error) {
       console.warn('Audio not supported:', error);
